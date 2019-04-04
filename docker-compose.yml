@@ -1,0 +1,17 @@
+version: '3.5'
+
+services:
+
+  react-graphql:
+    container_name: react-graphql
+    image: react-graphql
+    build:
+      context: .
+      # dockerfile: Dockerfile
+    volumes:
+      - '.:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - '8000:3000'
+    environment:
+      - NODE_ENV=development
