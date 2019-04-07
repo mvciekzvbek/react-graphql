@@ -8,5 +8,6 @@ docker run -it \
     -v ${PWD}:/usr/src/app \
     -v /usr/src/app/node_modules \
     -p 8000:3000 \
+    -e CHOKIDAR_USEPOLLING=true \
     --rm \
     react-graphql
