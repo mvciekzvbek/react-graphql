@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Users from './Users';
 import { gql } from 'apollo-boost';
 import { BrowserRouter } from 'react-router-dom';

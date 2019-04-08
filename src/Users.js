@@ -3,17 +3,6 @@ import { Query, Mutation } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { ROOT_QUERY } from './App';
 
-// const ROOT_QUERY = gql`
-//     {   
-//         totalUsers
-//         allUsers {
-//             githubLogin
-//             name
-//             avatar
-//         }
-//     }
-// `
-
 const Users = () => 
     <Query 
         query={ROOT_QUERY}
@@ -28,6 +17,24 @@ const Users = () =>
                 refetch={refetch} />
         }}
     </Query>
+
+/**
+ * When the Mutation component invokes the updateUserCache function, it sends the cache and the data that
+ * has been returned in the mutation response.
+ * 
+ * We read the data from the current cache using readQuery, merge with data fetched in Mutation and save in cache.
+ * @param {*} cache 
+ * @param {*} param1 
+ */
+const updateCache = (cache, {data: {addFakeUsers}}) => {
+    let data = cache.readQuery({query: ROOT_QUERY});
+    data.totalUsers += addFakeUsers.length;
+    data.allUsers = [
+        ...data.allUsers,
+        ...addFakeUsers
+    ]
+    cache.writeQuery({query: ROOT_QUERY, data})
+}
 
 const UserList = ({count, users, refetch}) => {
     return (
@@ -45,7 +52,8 @@ const UserList = ({count, users, refetch}) => {
                 }
             `}
             variables={{count: 1}} 
-            refetchQueries={[{query: ROOT_QUERY}]}
+            update={updateCache}
+            // refetchQueries={[{query: ROOT_QUERY}]}
             >
                 {addFakeUsers =>
                     <button onClick={addFakeUsers}>Add Fake Users</button>

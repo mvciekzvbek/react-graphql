@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter } from 'react-router-dom';
-import { Query, Mutation} from 'react-apollo';
+import { Query, Mutation, withApollo, compose } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { ROOT_QUERY } from './App';
 
@@ -34,6 +34,18 @@ class AuthorizedUser extends React.Component {
     requestCode() {
         var clientID = "3d68acc66b2cb10108f6";
         window.location = `https://github.com/login/oauth/authorize?client_id=${clientID}&scope=user`
+    }
+
+    /**
+     * 1. Removes token from localStorage
+     * 2. Clears me field from current user saved in cache
+     * 3. Write query without user data => display "Sign in with Github" without refreshing the browser
+     */
+    logout() {
+        localStorage.removeItem('token');
+        let data = this.props.client.readQuery({query: ROOT_QUERY});
+        data.me = null;
+        this.props.client.writeQuery({query: ROOT_QUERY, data});
     }
 
     render() {
@@ -85,4 +97,4 @@ const CurrentUser = ({ name, avatar, logout }) => {
         </div>
     )
 }
-export default AuthorizedUser;
+export default compose(withApollo, withRouter)(AuthorizedUser);
