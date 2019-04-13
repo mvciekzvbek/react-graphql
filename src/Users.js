@@ -26,15 +26,15 @@ const Users = () =>
  * @param {*} cache 
  * @param {*} param1 
  */
-const updateCache = (cache, {data: {addFakeUsers}}) => {
-    let data = cache.readQuery({query: ROOT_QUERY});
-    data.totalUsers += addFakeUsers.length;
-    data.allUsers = [
-        ...data.allUsers,
-        ...addFakeUsers
-    ]
-    cache.writeQuery({query: ROOT_QUERY, data})
-}
+// const updateUserCache = (cache, {data: {addFakeUsers}}) => {
+//     let data = cache.readQuery({query: ROOT_QUERY});
+//     data.totalUsers += addFakeUsers.length;
+//     data.allUsers = [
+//         ...data.allUsers,
+//         ...addFakeUsers
+//     ]
+//     cache.writeQuery({query: ROOT_QUERY, data})
+// }
 
 const UserList = ({count, users, refetch}) => {
     return (
@@ -52,7 +52,7 @@ const UserList = ({count, users, refetch}) => {
                 }
             `}
             variables={{count: 1}} 
-            update={updateCache}
+            // update={updateUserCache}
             // refetchQueries={[{query: ROOT_QUERY}]}
             >
                 {addFakeUsers =>

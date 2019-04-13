@@ -2,9 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import ApolloClient, { InMemoryCache } from 'apollo-boost';
+import {
+    ApolloClient, 
+    InMemoryCache,
+    HttpLink,
+    ApolloLink,
+    split
+} from 'apollo-boost';
 import { ApolloProvider } from 'react-apollo';
 import { persistCache } from 'apollo-cache-persist';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
 
 import * as serviceWorker from './serviceWorker';
 
@@ -39,17 +47,66 @@ if (localStorage['apollo-cache-persist']) {
     cache.restore(cacheData);
 }
 
+/**
+ * used to send http requests
+ */
+const httpLink = new HttpLink({uri: 'http://localhost:4000/graphql'});
+
+/**
+ * httpLink is concatenated to the authLink to handle user authorization for HTTP requests
+ * When operation is sent to this link, it will first be passed to the authLink where the 
+ * authorizationn header is added to the operation before it is forwarded to the httpLink
+ * to handle network request.
+ * 
+ * Like express middleware.
+ */
+const authLink = new ApolloLink((operation, forward) => {
+    operation.setContext(context => ({
+        headers: {
+            ...context.headers,
+            authorization: localStorage.getItem('token')
+        }
+    }))
+    return forward(operation);
+})
+
+const httpAuthLink = authLink.concat(httpLink);
+
+/**
+ * used to send data over web sockets
+ */
+const wsLink = new WebSocketLink({
+    uri: `ws://localhost:4000/graphql`,
+    options: { reconnect: true }
+})
+
+/**
+ * split returns one of two Apollo Links based upon a predicate. 
+ * The first argument is function that returns a boolean.
+ * The second argument represents the link to return when the predicate returns true
+ * The third argument represents the link to return when the predicate returns false
+ */
+const link = split(
+    ({query}) => {
+        const {kind, operation} = getMainDefinition(query);
+        return kind === 'OperationDefinition' && operation === 'subscription'
+    },
+    wsLink,
+    httpAuthLink
+)
+
 const client = new ApolloClient({
     cache,
-    uri: 'http://localhost:3000/graphql',
-    request: operation => {
-        operation.setContext(context => ({
-            headers: {
-                ...context.headers,
-                authorization: localStorage.getItem('token')
-            }
-        }))
-    }
+    // uri: 'http://localhost:3000/graphql',
+    // request: operation => {
+    //     operation.setContext(context => ({
+    //         headers: {
+    //             ...context.headers,
+    //             authorization: localStorage.getItem('token')
+    //         }
+    //     }))
+    // }
+    link
 });
 
 ReactDOM.render(
