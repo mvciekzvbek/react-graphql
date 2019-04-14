@@ -1,5 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import Users from './Users';
+import Articles from './Articles';
+import PostArticle from './postArticle'
 import { gql } from 'apollo-boost';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import AuthorizedUser from './AuthorizedUser';
@@ -8,8 +10,21 @@ import { withApollo } from 'react-apollo';
 export const ROOT_QUERY = gql`
     query allUsers {   
         totalUsers
+        totalArticles
         allUsers { ...userInfo }
         me { ...userInfo }
+        allArticles {
+            id
+            title
+            lead
+            url
+            imageUrl
+            categories
+            postedBy {
+                githubLogin
+            }
+            created
+        }
     }
 
     fragment userInfo on User {
@@ -25,6 +40,23 @@ const LISTEN_FOR_USERS = gql`
             githubLogin,
             name,
             avatar
+        }
+    }
+`
+
+const LISTEN_FOR_ARTICLES = gql`
+    subscription {
+        newArticle {
+            id
+            title
+            lead
+            url
+            imageUrl
+            categories
+            postedBy {
+                githubLogin
+            }
+            created
         }
     }
 `
@@ -53,10 +85,23 @@ class App extends Component {
                 ]
                 client.writeQuery({query: ROOT_QUERY, data})
             })
+
+        this.listenForArticles = client
+            .subscribe({ query: LISTEN_FOR_ARTICLES })
+            .subscribe(({ data:{ newArticle } }) => {
+                const data = client.readQuery({ query: ROOT_QUERY })
+                data.totalPhotos += 1
+                data.allArticles = [
+                    ...data.allArticles,
+                    newArticle
+                ]
+                client.writeQuery({ query: ROOT_QUERY, data })
+            })     
     }
 
     componentWillUnmount () {
         this.listenForUsers.unsubscribe();
+        this.listenForArticles.unsubscribe();
     }
 
     render() {
@@ -67,10 +112,10 @@ class App extends Component {
                         <Fragment>
                             <AuthorizedUser />
                             <Users />
-                            {/* <Articles /> */}
+                            <Articles />
                         </Fragment>
                     } />
-                    {/* <Route path="/new" component={PostArticle} /> */}
+                    <Route path="/new" component={PostArticle} />
                     <Route component={({ location }) => <h1>"{location.pathname}" not found</h1>} />
                 </Switch>
             </BrowserRouter>  

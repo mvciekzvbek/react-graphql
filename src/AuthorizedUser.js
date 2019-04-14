@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { Query, Mutation, withApollo, compose } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { ROOT_QUERY } from './App';
@@ -93,6 +93,7 @@ const CurrentUser = ({ name, avatar, logout }) => {
         <div>
             <img src={avatar} width={48} height={48} alt="" />
             <h1>{name}</h1>
+            <Link to="/new">Write an article</Link>
             <button onClick={logout}>Logout</button>
         </div>
     )
