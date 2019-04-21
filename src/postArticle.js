@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import { Mutation } from 'react-apollo';
 import { gql } from 'apollo-boost';
-import { ROOT_QUERY } from './App';
 
 const POST_ARTICLE_MUTATION = gql`
     mutation postArticle($input: PostArticleInput!) {

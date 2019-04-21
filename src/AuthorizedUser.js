@@ -17,6 +17,10 @@ class AuthorizedUser extends React.Component {
         signingIn: false
     }
 
+    constructor(props) {
+        super(props)
+    }
+
     authorizationComplete = (cache, {data}) => {
         localStorage.setItem('token', data.githubAuth.token);
         this.props.history.replace('/');
@@ -41,11 +45,11 @@ class AuthorizedUser extends React.Component {
      * 2. Clears me field from current user saved in cache
      * 3. Write query without user data => display "Sign in with Github" without refreshing the browser
      */
-    logout() {
+    logout = () => {
         localStorage.removeItem('token');
-        let data = this.props.client.readQuery({query: ROOT_QUERY});
+        let data = this.props.client.readQuery({query: ROOT_QUERY, variables: {filter:{}, page:{}, sort:{}}});
         data.me = null;
-        this.props.client.writeQuery({query: ROOT_QUERY, data});
+        this.props.client.writeQuery({query: ROOT_QUERY, data, variables: {filter:{}, page:{}, sort:{}}});
     }
 
     render() {
@@ -53,14 +57,17 @@ class AuthorizedUser extends React.Component {
             <Mutation
                 mutation={GITHUB_AUTH_MUTATION}
                 update={this.authorizationComplete}
-                refetchQueries={[{query: ROOT_QUERY}]}>
+                refetchQueries={[{
+                    query: ROOT_QUERY, 
+                    variables: {filter:{}, page:{}, sort:{}}
+                }]}>
                 {mutation => {
                     this.githubAuthMutation = mutation;
                     return (
                         <Me
                             signingIn={this.state.signingIn}
                             requestCode={this.requestCode}
-                            logout={()=>{localStorage.removeItem('token')}}/>
+                            logout={this.logout} />
                         // <button 
                         //     onClick={this.requestCode} 
                         //     disabled={this.state.signingIn}>
@@ -74,8 +81,10 @@ class AuthorizedUser extends React.Component {
 }
 
 const Me = ({ logout, requestCode, signingIn }) => 
-    <Query query={ROOT_QUERY}>
-        {({ loading, data }) => data.me ?
+    <Query 
+        query={ROOT_QUERY}
+        variables={{filter: {}, page:{}, sort:{}}}> 
+        {({ loading, data }) =>  data && data.me ?
             <CurrentUser {...data.me} logout={logout} /> :
             loading ? 
                 <p>Loading...</p> :
@@ -86,7 +95,6 @@ const Me = ({ logout, requestCode, signingIn }) =>
                 </button>
         } 
     </Query>
-
 
 const CurrentUser = ({ name, avatar, logout }) => {
     return (

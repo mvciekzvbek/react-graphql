@@ -6,9 +6,11 @@ import { ROOT_QUERY } from './App';
 const Users = () => 
     <Query 
         query={ROOT_QUERY}
+        variables={{filter:{}, page:{}, sort:{}}}
         // pollInterval={60000}
     >
         {({ data, error, loading, refetch }) => {
+            console.log(data);
             if (loading) return <p>Loading...</p>
             if (error) return <p>Error</p>
             return <UserList 

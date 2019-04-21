@@ -8,12 +8,12 @@ import AuthorizedUser from './AuthorizedUser';
 import { withApollo } from 'react-apollo';
 
 export const ROOT_QUERY = gql`
-    query allUsers {   
+    query allUsers($filter: ArticleFilter $page: DataPage $sort: DataSort) {   
         totalUsers
         totalArticles
         allUsers { ...userInfo }
         me { ...userInfo }
-        allArticles {
+        allArticles(filter: $filter paging: $page sorting: $sort) {
             id
             title
             lead
@@ -63,7 +63,7 @@ const LISTEN_FOR_ARTICLES = gql`
 
 class App extends Component {
     componentDidMount () {
-        console.log(this.props)
+        // console.log(this.props)
         let {client} = this.props;
 
         /**
@@ -111,7 +111,7 @@ class App extends Component {
                     <Route exact path="/" component={() =>
                         <Fragment>
                             <AuthorizedUser />
-                            <Users />
+                            <Users /> 
                             <Articles />
                         </Fragment>
                     } />
