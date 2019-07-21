@@ -1,7 +1,11 @@
 import React from 'react';
 import { Query, Mutation } from 'react-apollo';
-import { gql } from 'apollo-boost';
+// import { gql } from 'apollo-boost';
 import { ROOT_QUERY } from './App';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+
 
 const Users = () => 
     <Query 
@@ -10,7 +14,7 @@ const Users = () =>
         // pollInterval={60000}
     >
         {({ data, error, loading, refetch }) => {
-            console.log(data);
+            // console.log(data);
             if (loading) return <p>Loading...</p>
             if (error) return <p>Error</p>
             return <UserList 
@@ -38,12 +42,52 @@ const Users = () =>
 //     cache.writeQuery({query: ROOT_QUERY, data})
 // }
 
+const useStyles = makeStyles({
+    container: {
+        paddingTop: "32px",
+        paddingBottom: "32px"
+    },
+    avatar: {
+        height: 0,
+        paddingTop: "100%",
+        // width: "250px",
+        // height: "250px",
+        backgroundRepat: "no-repeat",
+        backgroundSize: "cover"
+    }
+    // root: {
+    //     flexGrow: 1,
+    //     position: "relative"
+    // },
+    // gridContainer: {
+    //     marginBottom: "32px"
+    // },
+    // gridItem: {
+    //     height: "350px"
+    // },
+    // button: {
+    //     position: "absolute",
+    //     backgroundColor: "#0093ff",
+    //     '&:hover': {
+    //         backgroundColor: "#0093ff"
+    //     }
+    // },
+    // "button--left": {
+    //     left: 0
+    // },
+    // "button--right": {
+    //     right: 0
+    // }
+});
+
 const UserList = ({count, users, refetch}) => {
+    const classes = useStyles();
+
     return (
         <div>
-            <p>{count} users</p>
-            <button onClick={() => refetch()}>Refetch</button>
-            <Mutation 
+            {/* <p>{count} users</p>
+            <button onClick={() => refetch()}>Refetch</button> */}
+            {/* <Mutation 
                 mutation={gql`
                     mutation addFakeUsers($count: Int!) {
                         addFakeUsers(count: $count) {
@@ -60,26 +104,29 @@ const UserList = ({count, users, refetch}) => {
                 {addFakeUsers =>
                     <button onClick={addFakeUsers}>Add Fake Users</button>
                 }
-            </Mutation>
-            <ul>
-                {users.map(user => 
-                    <UserListItem
-                        key={user.githubLogin}
-                        name={user.name}
-                        avatar={user.avatar}
-                    />
-                )}
-            </ul>
+            </Mutation> */}
+            <Container className={classes.container}>
+                <Grid container spacing={0}>
+                    {users.map(user => {
+                        console.log(user.id) 
+                        return <Grid item sm={2} xs={4} key={user.id}>
+                            <UserListItem
+                                name={user.name}
+                                avatar={user.avatar}
+                            />
+                        </Grid>
+                    })}
+                </Grid>
+            </Container>
         </div>
     )
 }
 
 const UserListItem = ({name, avatar}) => {
+    const classes = useStyles();
+
     return (
-        <li>
-            <img src={avatar} width={48} height={48} alt="" />
-            {name}
-        </li>
+        <div className={classes.avatar} style={{backgroundImage: `url(${avatar})`}}></div>
     )
 }
 export default Users;

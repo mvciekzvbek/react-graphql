@@ -3,6 +3,10 @@ import { withRouter, Link } from 'react-router-dom';
 import { Query, Mutation, withApollo, compose } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { ROOT_QUERY } from './App';
+import Button from '@material-ui/core/Button';
+import { makeStyles } from '@material-ui/core/styles';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 
 const GITHUB_AUTH_MUTATION = gql`
     mutation githubAuth($code: String!) {
@@ -12,14 +16,29 @@ const GITHUB_AUTH_MUTATION = gql`
     }
 `
 
+const useStyles = makeStyles(theme => ({
+  	link: {
+		textDecoration: "none"
+	},
+    button: {
+      color: "white"
+    },
+    avatar: {
+        width: "35px",
+        height: "35px",
+        borderRadius: '50%'
+    }
+  }));
+  
+
 class AuthorizedUser extends React.Component {
     state = {
         signingIn: false
     }
 
-    constructor(props) {
-        super(props)
-    }
+    // constructor(props) {
+    //     super(props)
+    // }
 
     authorizationComplete = (cache, {data}) => {
         localStorage.setItem('token', data.githubAuth.token);
@@ -65,9 +84,9 @@ class AuthorizedUser extends React.Component {
                     this.githubAuthMutation = mutation;
                     return (
                         <Me
-                            signingIn={this.state.signingIn}
-                            requestCode={this.requestCode}
-                            logout={this.logout} />
+                          signingIn={this.state.signingIn}
+                          requestCode={this.requestCode}
+                          logout={this.logout} />
                         // <button 
                         //     onClick={this.requestCode} 
                         //     disabled={this.state.signingIn}>
@@ -80,30 +99,63 @@ class AuthorizedUser extends React.Component {
     }
 }
 
-const Me = ({ logout, requestCode, signingIn }) => 
-    <Query 
+const Me = ({ logout, requestCode, signingIn }) =>  {
+    const classes = useStyles();
+
+    return <Query 
         query={ROOT_QUERY}
         variables={{filter: {}, page:{}, sort:{}}}> 
         {({ loading, data }) =>  data && data.me ?
             <CurrentUser {...data.me} logout={logout} /> :
             loading ? 
                 <p>Loading...</p> :
-                <button
+                <Button
+                    className={classes.button}
+                    // variant="contained"
                     onClick={requestCode}
                     disabled={signingIn}>
                     Sign in with GitHub
-                </button>
+                </Button>
+
+
         } 
     </Query>
+}
 
 const CurrentUser = ({ name, avatar, logout }) => {
+    const classes = useStyles();
+    const [anchorEl, setAnchorEl] = React.useState(null);
+
+    function handleClick(event) {
+      setAnchorEl(event.currentTarget);
+    }
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    }
+
     return (
         <div>
-            <img src={avatar} width={48} height={48} alt="" />
-            <h1>{name}</h1>
-            <Link to="/new">Write an article</Link>
-            <button onClick={logout}>Logout</button>
+            <Link className={classes.link} to="/users">
+                <Button className={classes.button}>Users</Button>
+            </Link>
+            <Link className={classes.link} to="/new">
+                <Button className={classes.button}>New</Button>
+            </Link>
+            <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+                <img className={classes.avatar} src={avatar} alt="" />
+            </Button>
+            <Menu
+                id="simple-menu"
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+            >
+                <MenuItem>{name}</MenuItem>
+                <MenuItem onClick={logout}>Logout</MenuItem>
+            </Menu>
         </div>
-    )
+        )
 }
 export default compose(withApollo, withRouter)(AuthorizedUser);

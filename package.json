@@ -3,11 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.2.1",
+    "@material-ui/icons": "^4.2.1",
     "apollo-boost": "^0.3.1",
     "apollo-cache-persist": "^0.1.1",
     "apollo-link-ws": "^1.0.17",
     "apollo-utilities": "^1.2.1",
+    "classnames": "^2.2.6",
     "graphql": "^14.2.1",
+    "material-ui-icons": "^1.0.0-beta.36",
+    "moment": "^2.24.0",
     "react": "^16.8.6",
     "react-apollo": "^2.5.4",
     "react-dom": "^16.8.6",
@@ -16,7 +21,7 @@
     "subscriptions-transport-ws": "^0.9.16"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

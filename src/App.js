@@ -1,36 +1,48 @@
-import React, {Component, Fragment} from 'react';
+import React, {Component} from 'react';
+import Navigation from './Navigation';
 import Users from './Users';
+import User from './User';
 import Articles from './Articles';
+import Article from './Article';
+import Categories from './Categories';
+import Category from './Category';
 import PostArticle from './postArticle'
 import { gql } from 'apollo-boost';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import AuthorizedUser from './AuthorizedUser';
 import { withApollo } from 'react-apollo';
+import { withStyles } from '@material-ui/core/styles';
+
+const styles = theme => ({
+    container: {
+        paddingTop: "32px"
+    }
+  });
 
 export const ROOT_QUERY = gql`
-    query allUsers($filter: ArticleFilter $page: DataPage $sort: DataSort) {   
-        totalUsers
-        totalArticles
+    query allUsers($filter: ArticleFilter $page: DataPage $sort: DataArticleSort) {   
+        # usersCount
+        # articlesCount
         allUsers { ...userInfo }
         me { ...userInfo }
         allArticles(filter: $filter paging: $page sorting: $sort) {
             id
             title
-            lead
+            # lead
             url
             imageUrl
             categories
-            postedBy {
+            authors {
                 githubLogin
             }
-            created
+            # created
         }
     }
 
     fragment userInfo on User {
       githubLogin 
       name
-      avatar
+      avatar,
+      id
     }
 `
 
@@ -53,7 +65,7 @@ const LISTEN_FOR_ARTICLES = gql`
             url
             imageUrl
             categories
-            postedBy {
+            authors {
                 githubLogin
             }
             created
@@ -77,8 +89,8 @@ class App extends Component {
         this.listenForUsers = client
             .subscribe({query: LISTEN_FOR_USERS})
             .subscribe(({data: { newUser } }) => {
-                const data = client.readQuery({query: ROOT_QUERY}) 
-                data.totalUsers += 1
+                const data = client.readQuery({query: ROOT_QUERY, variables: {filter: {}, page: {first: 2, start: 0}, sort: {}}}) 
+                data.usersCount += 1
                 data.allUsers = [
                     ...data.allUsers,
                     newUser
@@ -89,8 +101,8 @@ class App extends Component {
         this.listenForArticles = client
             .subscribe({ query: LISTEN_FOR_ARTICLES })
             .subscribe(({ data:{ newArticle } }) => {
-                const data = client.readQuery({ query: ROOT_QUERY })
-                data.totalPhotos += 1
+                const data = client.readQuery({ query: ROOT_QUERY, variables: {filter: {}, page: {first: 2, start: 0}, sort: {}} })
+                data.articlesCount += 1
                 data.allArticles = [
                     ...data.allArticles,
                     newArticle
@@ -107,15 +119,15 @@ class App extends Component {
     render() {
         return (
             <BrowserRouter>
+                <Navigation />
                 <Switch>
-                    <Route exact path="/" component={() =>
-                        <Fragment>
-                            <AuthorizedUser />
-                            <Users /> 
-                            <Articles />
-                        </Fragment>
-                    } />
-                    <Route path="/new" component={PostArticle} />
+                    <Route component={Articles} exact path="/" />
+                    <Route component={PostArticle} path="/new"/>
+                    <Route component={Article} path="/articles/:id"  />
+                    <Route component={Users} exact path="/users" />
+                    <Route component={User} path="/users/:id" />
+                    <Route component={Categories} path="/categories" />
+                    <Route component={Category} path="/categories/:id" />
                     <Route component={({ location }) => <h1>"{location.pathname}" not found</h1>} />
                 </Switch>
             </BrowserRouter>  
@@ -123,4 +135,4 @@ class App extends Component {
     }
 }
 
-export default withApollo(App);
+export default withApollo(withStyles(styles)(App));
