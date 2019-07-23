@@ -16,7 +16,9 @@ const ARTICLE_QUERY = gql`
             content
             url
             imageUrl
-            categories
+            categories {
+                name
+            }
             authors {
                 id
                 githubLogin,

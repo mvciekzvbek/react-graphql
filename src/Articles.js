@@ -1,13 +1,32 @@
 import React from 'react';
 import { Query, withApollo, compose } from 'react-apollo';
-import { ROOT_QUERY } from './App';
+// import { ROOT_QUERY } from './App';
 import Grid from '@material-ui/core/Grid';
 import ArticlesListItem from './ArticleListItem';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import classNames from 'classnames';
 import Container from '@material-ui/core/Container';
+import { gql } from 'apollo-boost';
 
+export const ARTICLES_QUERY = gql`
+    query allArticles ($filter: ArticleFilter $page: DataPage $sort: DataArticleSort) {   
+        allArticles (filter: $filter paging: $page sorting: $sort) {
+            id
+            title
+            # lead
+            url
+            imageUrl
+            # categories {
+            #     name
+            # }
+            authors {
+                githubLogin
+            }
+            # created
+        }
+    }
+`
 
 const styles = theme => ({
     container: {
@@ -50,16 +69,16 @@ class Articles extends React.Component {
         sort: {}
     }
 
-    // constructor(props) {
-    //     super(props)
-    // }
+    constructor(props) {
+        super(props)
+    }
 
     render () {
         const {classes, client} = this.props;
 
         return (
             <Container className={classes.container}>
-                <Query query={ROOT_QUERY} variables={this.state}> 
+                <Query query={ARTICLES_QUERY} variables={this.state}> 
                     {({loading, data}) => loading ? 
                         <p>Loading...</p> :
                         <div className={classes.root}>

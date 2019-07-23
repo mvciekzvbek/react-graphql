@@ -17,11 +17,11 @@ const useStyles = makeStyles(theme => ({
 
 const CategoryBox = (props) => {
     const classes = useStyles();
-
     const {data} = props;    
+    
     return <div className={classes.root}>
         {data.map((category, index) => {
-            return <Chip key={index} className={classes.chip} label={category}/>
+            return <Chip key={index} className={classes.chip} label={category.name}/>
         })}
     </div>
 }

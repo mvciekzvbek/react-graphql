@@ -19,18 +19,20 @@ const styles = theme => ({
   });
 
 export const ROOT_QUERY = gql`
-    query allUsers($filter: ArticleFilter $page: DataPage $sort: DataArticleSort) {   
+    query allUsers {   
         # usersCount
         # articlesCount
         allUsers { ...userInfo }
         me { ...userInfo }
-        allArticles(filter: $filter paging: $page sorting: $sort) {
+        allArticles {
             id
             title
             # lead
             url
             imageUrl
-            categories
+            categories {
+                name
+            }
             authors {
                 githubLogin
             }
@@ -64,7 +66,9 @@ const LISTEN_FOR_ARTICLES = gql`
             lead
             url
             imageUrl
-            categories
+            categories {
+                name
+            }
             authors {
                 githubLogin
             }
@@ -89,7 +93,7 @@ class App extends Component {
         this.listenForUsers = client
             .subscribe({query: LISTEN_FOR_USERS})
             .subscribe(({data: { newUser } }) => {
-                const data = client.readQuery({query: ROOT_QUERY, variables: {filter: {}, page: {first: 2, start: 0}, sort: {}}}) 
+                const data = client.readQuery({ query: ROOT_QUERY }) 
                 data.usersCount += 1
                 data.allUsers = [
                     ...data.allUsers,
@@ -101,12 +105,13 @@ class App extends Component {
         this.listenForArticles = client
             .subscribe({ query: LISTEN_FOR_ARTICLES })
             .subscribe(({ data:{ newArticle } }) => {
-                const data = client.readQuery({ query: ROOT_QUERY, variables: {filter: {}, page: {first: 2, start: 0}, sort: {}} })
+                const data = client.readQuery({ query: ROOT_QUERY })
                 data.articlesCount += 1
                 data.allArticles = [
                     ...data.allArticles,
                     newArticle
                 ]
+                console.log(data);
                 client.writeQuery({ query: ROOT_QUERY, data })
             })     
     }

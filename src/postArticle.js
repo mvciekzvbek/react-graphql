@@ -1,6 +1,13 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { Mutation } from 'react-apollo';
 import { gql } from 'apollo-boost';
+import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+import MultipleSelect from './MultipleSelect'
+import Paper from '@material-ui/core/Paper';
+import Container from '@material-ui/core/Container';
+import classNames from 'classnames';
 
 const POST_ARTICLE_MUTATION = gql`
     mutation postArticle($input: PostArticleInput!) {
@@ -9,130 +16,170 @@ const POST_ARTICLE_MUTATION = gql`
             lead
             content
             imageUrl
-            categories
+            categories {
+                name
+            }
         }
     }
 `
 
-class PostArticle extends Component {
-    constructor(props) {
-        super(props);
+const useStyles = makeStyles(theme => ({
+    container: {
+        paddingTop: "32px",
+        paddingBottom: "32px",
+        maxWidth: "900px",
+        width: "100%"
+    },
+    paper: {
+        padding: "32px"
+    },
+    textField: {
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        width: "100%",
+    },
+    menu: {
+        width: 200,
+    },
+    buttonsWrapper: {
+        margin: "10px",
+        position: "relative",
+        width: "100%",
+        height: "50px",
+    },
+    button: {
+        color: "white",
+        backgroundColor: "#0093ff",
+        position: "absolute",
+        top: "50%",
+        transform: "translateY(-50%)",
 
-        this.state = {
-            title: '',
-            lead: '',
-            content: '',
-            imageUrl: '',
-            categories: []
+        '&:hover': {
+            backgroundColor: "#0093ff"
         }
+    },
+    "button--left": {
+        left: 0
+    },
+    "button--right": {
+        right: 0
     }
+}));
 
-    postArticle = async (mutation) => {
-        console.log(this.state);
+const categories = [
+    "Javascript",
+    "HTML5",
+    "CSS3",
+    "Java",
+    "GraphQL",
+    "Node",
+    "React",
+    "Redux",
+    "Angular",
+    "Architecture",
+    "Microservices",
+    "DevOps",
+    "Docker"
+]
+
+export default function PostArticle (props) {
+    const classes = useStyles();
+
+    const [values, setValues] = React.useState({
+        title: '',
+        lead: '',
+        content: '',
+        imageUrl: '',
+        categories: []
+    })
+
+    const handleChange = (name, e) => event => {
+        const val = event && event.target ? event.target.value : e;
+        setValues({ ...values, [name]: val });
+    };
+
+
+    const postArticle = async (mutation) => {
         await mutation({
             variables: {
-                input: this.state
+                input: values
             }
         }).catch(console.error)
 
-        this.props.history.replace('/');
+        props.history.replace('/');
     }
 
-    // updateArticles = (cache, {data: {postAricle}}) => {
-    //     var data = cache.readQuery({query: ROOT_QUERY});
-
-    //     data.allArticles += 1
-    //     data.allPhotos = [
-    //         postAricle,
-    //         ...data.allArticles
-    //     ]
-    //     cache.writeQuery({query: ROOT_QUERY}, data)
-    // }
-
-    render () {
-        return(
-            <form onSubmit={(e) => e.preventDefault()}
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start'
-                }}>
-                <h1>Post an article</h1>
-                <input
-                    type="text"
-                    style={{margin: "10px"}}
-                    placeholder="Article title"
-                    value={this.state.title}
-                    onChange={({target}) => this.setState({title: target.value})}
-                />
-                <input
-                    type="text"
-                    style={{margin: "10px"}}
-                    placeholder="Article lead"
-                    value={this.state.lead}
-                    onChange={({target}) => this.setState({lead: target.value})}
-                />
-                <input
-                    type="text"
-                    style={{margin: "10px"}}
-                    placeholder="Article image url"
-                    value={this.state.imageUrl}
-                    onChange={({target}) => this.setState({imageUrl: target.value})}
-                />
-                <select 
-                    value={this.state.categories}
-                    style={{margin: "10px"}}
-                    onChange={({target}) => {
-                        if(this.state.categories.indexOf(target.value) < 0) {
-                            this.setState({
-                                categories: this.state.categories.concat(target.value)
-                            }, () => {
-                                console.log(this.state)
-                            })
-                        } else {
-                            console.log('Duplicated category');
-                        }
-                    }}
-                    multiple>
-                    <option value="Javascript">Javascript</option>
-                    <option value="HTML5">HTML5</option>
-                    <option value="CSS3">CSS3</option>
-                    <option value="Java">Java</option>
-                    <option value="GraphQL">GraphQL</option>
-                    <option value="Node">Node</option>
-                    <option value="React">React</option>
-                    <option value="Redux">Redux</option>
-                    <option value="Angular">Angular</option>
-                    <option value="Architecture">Architecture</option>
-                    <option value="Microservices">Microservices</option>
-                    <option value="DevOps">DevOps</option>
-                    <option value="Docker">Docker</option>
-                </select>
-                <textarea
-                    type="text"
-                    style={{margin: "10px"}}
-                    placeholder="Article content"
-                    value={this.state.content}
-                    onChange={({target}) => this.setState({content: target.value})}
-                    rows={25}
-                    cols={150}
-                />
-                <div 
+    return (
+        <Container className={classes.container}>
+            <Paper className={classes.paper}>
+                <form onSubmit={(e) => e.preventDefault()}
                     style={{
-                        margin: "10px"
-                    }}>
-                    <button onClick={() => this.props.history.goBack()}>Cancel</button>
-                    <Mutation 
-                        mutation={POST_ARTICLE_MUTATION}>
-                        {mutation => 
-                            <button onClick={() => this.postArticle(mutation)}>Post</button>
-                        }
-                    </Mutation>
-                </div>
-            </form>
-        )
-    }
-}
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-start'
+                    }}
+                    noValidate autoComplete="off"
+                >
+                    <TextField
+                        label="Title"
+                        className={classes.textField}
+                        value={values.title}
+                        onChange={handleChange("title")}
+                        margin="normal"
+                        placeholder="Article title"
+                    />
+                    <TextField
+                        label="Lead"
+                        className={classes.textField}
+                        value={values.lead}
+                        onChange={handleChange("lead")}
+                        margin="normal"
+                        placeholder="Article lead"
+                    />
+                    <TextField
+                        label="Image"
+                        className={classes.textField}
+                        value={values.imageUrl}
+                        onChange={handleChange("imageUrl")}
+                        margin="normal"
+                        placeholder="Image url"
+                    />
+                    <MultipleSelect data={categories} updateParent={(e)=>{
+                        //hak
+                        handleChange("categories",e)()
+                    }}/>
 
-export default PostArticle;
+                    <TextField
+                        label="Content"
+                        className={classes.textField}
+                        value={values.content}
+                        onChange={handleChange("content")}
+                        margin="normal"
+                        placeholder="Article content"
+                        multiline
+                        rows="10"
+                        rowsMax="50"
+                        variant="outlined"
+                    />
+
+                    <div className={classes.buttonsWrapper}>
+                        <Button 
+                            className={classNames(classes.button, classes["button--left"])}
+                            variant="contained" 
+                            onClick={() => props.history.goBack()}>Cancel</Button>
+                        <Mutation 
+                            mutation={POST_ARTICLE_MUTATION}>
+                            {mutation => 
+                                <Button 
+                                    className={classNames(classes.button, classes["button--right"])}
+                                    variant="contained" 
+                                    onClick={() => postArticle(mutation)}>Post</Button>
+                            }
+                        </Mutation>
+                    </div> 
+                </form>
+            </Paper>
+        </Container>
+    )
+}
