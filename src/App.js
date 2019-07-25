@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import './App.css'
 import Navigation from './Navigation';
 import Users from './Users';
 import User from './User';
@@ -79,7 +80,6 @@ const LISTEN_FOR_ARTICLES = gql`
 
 class App extends Component {
     componentDidMount () {
-        // console.log(this.props)
         let {client} = this.props;
 
         /**
@@ -111,7 +111,6 @@ class App extends Component {
                     ...data.allArticles,
                     newArticle
                 ]
-                console.log(data);
                 client.writeQuery({ query: ROOT_QUERY, data })
             })     
     }
@@ -132,7 +131,7 @@ class App extends Component {
                     <Route component={Users} exact path="/users" />
                     <Route component={User} path="/users/:id" />
                     <Route component={Categories} exact path="/categories" />
-                    <Route component={Articles} path="/categories/:id" />
+                    <Route component={Category} path="/categories/:id" />
                     <Route component={({ location }) => <h1>"{location.pathname}" not found</h1>} />
                 </Switch>
             </BrowserRouter>  

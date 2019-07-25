@@ -24,7 +24,7 @@ const useStyles = makeStyles({
 });
 
 const ArticlesListItem = (props) => {
-    const {data} = props;
+    const {data, author} = props;
     const classes = useStyles();
 
     return <Link className={classes.anchor} to={data.url} params={data}>
@@ -41,7 +41,7 @@ const ArticlesListItem = (props) => {
                     {data.title}
                 </Typography>
                 <Typography variant="body1" gutterBottom>
-                    @{data.authors[0].githubLogin}
+                    @{author ? author.githubLogin : data.authors[0].githubLogin }
                 </Typography>
                 {/* <Typography variant="body2">
                     {data.lead}

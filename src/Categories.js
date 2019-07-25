@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { gql } from 'apollo-boost';
 import { Query, withApollo, compose } from 'react-apollo';
@@ -84,7 +84,7 @@ const Categories = (props) => {
                         <Grid container spacing={7} className={classes.gridList} cols={4}>
                             {data.allCategories.map(category => 
                                 <Grid item sm={3} xs={12} key={category.id} tabIndex="-1">
-                                    <Link className={classes.anchor} to={`/categories/${category.name}`} tabIndex="-1">
+                                    <Link className={classes.anchor} to={`/categories/${category.id}`} tabIndex="-1">
                                         <div className={classes.thumbnail} style={{backgroundImage: `url(${category.thumbnail})`}} >
                                             <div className={classes.layer}>
                                                 <span className={classes.name}>{category.name}</span>

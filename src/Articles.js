@@ -28,8 +28,6 @@ export const ARTICLES_QUERY = gql`
     }
 `
 
-
-
 const styles = theme => ({
     container: {
         paddingTop: "32px",
@@ -61,38 +59,19 @@ const styles = theme => ({
 });
 
 class Articles extends React.Component {
-    constructor(props) {
-        console.log(props)
+    state = {
+                filter: {
+                },
+                page: {
+                    first: 6,
+                    start: 0
+                },
+                sort: {}
+            }
+
+    constructor (props) {
         super(props)
-        if (this.props.match.params.id) {
-            console.log('now');
-
-           this.state = {
-                filter: {
-                    "categories": [this.props.match.params.id]
-                },
-                page: {
-                    first: 6,
-                    start: 0
-                },
-                sort: {}
-            }
-        } else {
-            this.state = {
-                filter: {
-                },
-                page: {
-                    first: 6,
-                    start: 0
-                },
-                sort: {}
-            }
-        }        
     }
-
-    // capitalizeFirstLetter (string) {
-    //     return string.charAt(0).toUpperCase() + string.slice(1);
-    // }
 
     render () {
         const {classes, client} = this.props;
