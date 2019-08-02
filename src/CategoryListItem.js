@@ -8,36 +8,38 @@ import Typography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles({
-    // card: {
-    //     height: "100%"
-    // },
-    // media: {
-    //     height: 0,
-    //     paddingTop: "50%"
-    // },
-    // anchor: {
-    //     textDecoration: "none",
-    //     color: "inherit",
-    //     display: "block",
-    //     height: "100%"
-    // },
-    thumbnail: {
-        height: 0,
-        paddingTop: "100%",
-        // width: "250px",
-        // height: "250px",
-        backgroundRepeat: "no-repeat",
-        backgroundSize: "cover"
-    }
+  // card: {
+  //     height: "100%"
+  // },
+  // media: {
+  //     height: 0,
+  //     paddingTop: "50%"
+  // },
+  // anchor: {
+  //     textDecoration: "none",
+  //     color: "inherit",
+  //     display: "block",
+  //     height: "100%"
+  // },
+  thumbnail: {
+    height: 0,
+    paddingTop: '100%',
+    // width: "250px",
+    // height: "250px",
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+  },
 });
 
 const CategoryListItem = (props) => {
-    const {data} = props;
-    const classes = useStyles();
+  const { data } = props;
+  const classes = useStyles();
 
-    return <Link className={classes.anchor} to={`/categories/${data.id}`}>
-        <div className={classes.thumbnail} style={{backgroundImage: `url(${data.thumbnail})`}}></div>
+  return (
+    <Link className={classes.anchor} to={`/categories/${data.id}`}>
+      <div className={classes.thumbnail} style={{ backgroundImage: `url(${data.thumbnail})` }} />
     </Link>
-}
+  );
+};
 
 export default CategoryListItem;

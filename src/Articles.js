@@ -12,18 +12,20 @@ import { gql } from 'apollo-boost';
 export const ARTICLES_QUERY = gql`
     query allArticles ($filter: ArticleFilter $page: DataPage $sort: DataArticleSort) {   
         allArticles (filter: $filter paging: $page sorting: $sort) {
-            id
-            title
-            # lead
-            url
-            imageUrl
-            # categories {
-            #     name
-            # }
-            authors {
-                githubLogin
+            hits {
+                id
+                title
+                # lead
+                url
+                image_url
+                # categories {
+                #     name
+                # }
+                author {
+                    githubLogin
+                }
+                # created
             }
-            # created
         }
     }
 `
@@ -60,14 +62,11 @@ const styles = theme => ({
 
 class Articles extends React.Component {
     state = {
-                filter: {
-                },
-                page: {
-                    first: 6,
-                    start: 0
-                },
-                sort: {}
-            }
+        page: {
+            first: 6,
+            start: 0
+        }
+    }
 
     constructor (props) {
         super(props)
@@ -83,7 +82,7 @@ class Articles extends React.Component {
                         <p>Loading...</p> :
                         <div className={classes.root}>
                             <Grid container spacing={3} className={classes.gridContainer}>
-                                {data.allArticles.map(article => 
+                                {data.allArticles.hits.map(article => 
                                     <Grid item sm={4} xs={12} key={article.id} className={classes.gridItem}>
                                         <ArticlesListItem data={article} />
                                     </Grid>

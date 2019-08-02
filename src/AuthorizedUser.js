@@ -122,7 +122,7 @@ const Me = ({ logout, requestCode, signingIn }) =>  {
     </Query>
 }
 
-const CurrentUser = ({ name, avatar, logout }) => {
+const CurrentUser = ({ name, avatar_url, logout }) => {
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -143,7 +143,7 @@ const CurrentUser = ({ name, avatar, logout }) => {
                 <Button className={classes.button}>New</Button>
             </Link>
             <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
-                <img className={classes.avatar} src={avatar} alt="" />
+                <img className={classes.avatar} src={avatar_url} alt="" />
             </Button>
             <Menu
                 id="simple-menu"
