@@ -42,18 +42,9 @@ const ArticlesListItem = (props) => {
             {data.title}
           </Typography>
           <Typography variant="body1" gutterBottom>
-                    @
-            {author ? author.githubLogin : data.author.githubLogin }
+            @{ author ? author.githubLogin : data.author.githubLogin }
           </Typography>
-          {/* <Typography variant="body2">
-                    {data.lead}
-                </Typography> */}
         </CardContent>
-        {/* <p>{data.categories.join(',')}</p> */}
-        {/* <p>{data.categories.join(',')}</p>
-            <img src={data.imageUrl} width={200}/>
-            <p>{data.authors[0].githubLogin}</p>
-            <p>{data.created}</p> */}
       </Card>
     </Link>
   );

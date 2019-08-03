@@ -8,24 +8,6 @@ import Container from '@material-ui/core/Container';
 import { gql } from 'apollo-boost';
 import { makeStyles } from '@material-ui/core/styles';
 
-
-export const ARTICLES_QUERY = gql`
-  query allArticles ($filter: ArticleFilter $paging: DataPage $sorting: DataArticleSort) {   
-    allArticles (filter: $filter paging: $paging sorting: $sorting) {
-      hits {
-        id
-        title
-        url
-        image_url
-        author {
-            githubLogin
-        }
-      },
-      count
-    }
-  }
-`
-
 const useStyles = makeStyles({
   container: {
     paddingTop: "32px",
@@ -56,12 +38,44 @@ const useStyles = makeStyles({
   }
 });
 
-const ArticlesList = (props) => {
+const ARTICLES_QUERY = gql`
+  query allArticles ($paging: DataPage) {   
+    allArticles (paging: $paging) {
+      hits {
+        id
+        title
+        url
+        image_url
+        author {
+            githubLogin
+        }
+      },
+      count
+    }
+  }
+`
+
+const ArticlesList = () => {
   const classes = useStyles();
-  const [state, setState] = useState({paging: {
-    first: 6,
-    start: 0
-  }})
+  const [state, setState] = useState({
+    paging: {
+      first: 6,
+      start: 0  
+    }
+  })
+
+  const update = (fetchMore, next) => {
+    setState(next);
+    fetchMore({
+      variables: {
+        ...next
+      },
+      updateQuery: (prev, { fetchMoreResult}) => {
+        if (!fetchMoreResult) return prev;
+        return fetchMoreResult
+      }
+    })
+  }
 
   return (
     <Container className={classes.container}>
@@ -72,7 +86,7 @@ const ArticlesList = (props) => {
               <Grid container spacing={3} className={classes.gridContainer}>
                 {data.allArticles.hits.map(article => 
                   <Grid item sm={4} xs={12} key={article.id} className={classes.gridItem}>
-                      <ArticlesListItem data={article} />
+                    <ArticlesListItem data={article} />
                   </Grid>
                 )}
               </Grid>
@@ -89,16 +103,7 @@ const ArticlesList = (props) => {
                         start: current.start - 6
                       }
                     }
-                    setState(next);
-                    fetchMore({
-                      variables: {
-                        ...next
-                      },
-                      updateQuery: (prev, { fetchMoreResult}) => {
-                        if (!fetchMoreResult) return prev;
-                        return fetchMoreResult
-                      }
-                    })
+                    update(fetchMore, next)
                   }}
                   >Previous
                 </Button>
@@ -116,16 +121,7 @@ const ArticlesList = (props) => {
                         start: current.start + 6
                       }
                     }
-                    setState(next);
-                    fetchMore({
-                      variables: {
-                        ...next
-                      },
-                      updateQuery: (prev, { fetchMoreResult}) => {
-                        if (!fetchMoreResult) return prev;
-                        return fetchMoreResult
-                      }
-                    })
+                    return update(fetchMore, next)
                   }}
                   >Next
                 </Button>
